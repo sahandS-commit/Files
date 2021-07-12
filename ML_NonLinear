@@ -1,0 +1,36 @@
+#Libraries Section
+import pandas
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.wrappers.scikit_learn import KerasRegressor
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import KFold
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+import numpy as np
+# load dataset
+X = np.load('.../inputs.npy')
+Y = np.load('.../labels.npy')
+X_no_temp = np.delete(X,0,1)
+X_no_load = np.delete(X,1,1)
+X_no_time = np.delete(X,2,1)
+def baseline_model():
+	# create model
+	model = Sequential()
+	model.add(Dense(13, input_dim=3, kernel_initializer='normal', activation='relu'))
+	model.add(Dense(1, kernel_initializer='normal'))
+	# Compile model
+	model.compile(loss='mean_squared_error', optimizer='adam')
+	return model
+def baseline_model_2():
+	# create model
+	model = Sequential()
+	model.add(Dense(13, input_dim=2, kernel_initializer='normal', activation='relu'))
+	model.add(Dense(1, kernel_initializer='normal'))
+	# Compile model
+	model.compile(loss='mean_squared_error', optimizer='adam')
+	return model
+estimator = KerasRegressor(build_fn=baseline_model, epochs=100, batch_size=5, verbose=0)
+kfold = KFold(n_splits=10)
+results = cross_val_score(estimator, X, Y, cv=kfold)
+print("Results of all three, mean =  %.2f std = %.2f ,MSE" % (results.mean(), results.std()))
